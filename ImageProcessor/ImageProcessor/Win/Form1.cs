@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -45,13 +46,29 @@ namespace ImageProcessor
             }
 
             //开始去水印:获取文件 ，只取第一层级
-            var files = Directory.GetFiles(imageParam.PicPath, "*.jpg");
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles(imageParam.PicPath, "*.jpg"));
 
-            if (files?.Length == 0)
+            foreach (var dir in Directory.GetDirectories(imageParam.PicPath))
+            {
+                if (dir.EndsWith(targetPath, StringComparison.InvariantCultureIgnoreCase)
+                    || dir.EndsWith(bakpath, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                files.AddRange(Directory.GetFiles(dir, "*.jpg", SearchOption.AllDirectories));
+            }
+
+            if (!files.Any())
             {
                 MessageBox.Show("路径下不存在任何图片");
                 return;
             }
+
+            string rootpath = imageParam.PicPath.TrimEnd('\\');
+            string filepattern = $"{rootpath}\\(?<subpath>.*)\\.*.jpg";
+            filepattern = filepattern.Replace("\\", "\\\\");
 
             //多线程处理图片， 默认使用本机处理器数 * 2;
             ParallelOptions parallelOptions = new ParallelOptions
@@ -62,43 +79,49 @@ namespace ImageProcessor
 
             ImageProcessService service = new ImageProcessService();
 
-            string newtargetpath = Path.Combine(imageParam.PicPath, targetPath);
-            string newbakpath = Path.Combine(imageParam.PicPath, bakpath);
-            if (!Directory.Exists(newtargetpath))
-            {
-                Directory.CreateDirectory(newtargetpath);
-            }
-            if (!Directory.Exists(newbakpath))
-            {
-                Directory.CreateDirectory(newbakpath);
-            }
+            string newtargetpath = Path.Combine(rootpath, targetPath);
+            string newbakpath = Path.Combine(rootpath, bakpath);
 
             //开始处理图片
 
             //显示进度条
             progressBar1.Visible = true;
             progressBar1.Value = 0;  //清空进度条
-            int len = files.Length, flag = 1;
+            int len = files.Count, flag = 1;
             Parallel.ForEach(files, parallelOptions, (file) =>
             {
                 string fileName = Path.GetFileName(file);
-
-                //压缩图片，返回图片流
-                using (Image fileStream = Image.FromFile(file))
+                Match match = Regex.Match(file, filepattern, RegexOptions.IgnoreCase);
+                if (match.Success)
                 {
-                    MemoryStream memoryStream = service.GetImagePress(fileStream, imageParam);
-                    //保存图片到新目录
-                    Image.FromStream(memoryStream).Save(Path.Combine(newtargetpath, fileName));
-                }
+                    string subPath = match.Groups["subpath"].Value;
+                    string targetFileName = Path.Combine(rootpath, targetPath, subPath, fileName);
+                    string bakfilename = Path.Combine(rootpath, bakpath, subPath, fileName);
 
-                //移动旧图到备份目录  
-                new FileInfo(file).MoveTo(Path.Combine(newbakpath, fileName));
+                    CreateDirectory(targetFileName);
+                    CreateDirectory(bakfilename);
 
-                //展示进度
-                int newbar = Convert.ToInt32(Math.Ceiling(flag++ * 100.0 / len));
-                if (progressBar1.Value < newbar)
-                {
-                    progressBar1.Value = newbar;
+                    //压缩图片，返回图片流
+                    using (Image fileStream = Image.FromFile(file))
+                    {
+                        MemoryStream memoryStream = service.GetImagePress(fileStream, imageParam);
+                        //保存图片到新目录
+                        Image.FromStream(memoryStream).Save(targetFileName);
+                    }
+
+                    //移动旧图到备份目录  
+                    new FileInfo(file).MoveTo(bakfilename);
+
+                    //如果目录为空，则删除目录
+                    //需要考虑多级为空，依次递归删除至顶层目录
+                    
+
+                    //展示进度
+                    int newbar = Convert.ToInt32(Math.Ceiling(flag++ * 100.0 / len));
+                    if (progressBar1.Value < newbar)
+                    {
+                        progressBar1.Value = newbar;
+                    }
                 }
 
                 //Thread.Sleep(1000);
@@ -106,6 +129,23 @@ namespace ImageProcessor
             });
 
             MessageBox.Show("工作完成！");
+        }
+
+        private static readonly object cre_locker = new object();
+        /// <summary>
+        /// 创建目录
+        /// </summary>
+        /// <param name="filename"></param>
+        private static void CreateDirectory(string filename)
+        {
+            lock (cre_locker)
+            {
+                string path = Path.GetDirectoryName(filename);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
         }
 
         private ImageParam PrepareData()
