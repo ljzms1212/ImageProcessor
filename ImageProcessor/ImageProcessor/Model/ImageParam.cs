@@ -27,11 +27,6 @@ namespace ImageProcessor.Model
         public int Width { get; set; }
 
         /// <summary>
-        /// 高度
-        /// </summary>
-        public int Height { get; set; }
-
-        /// <summary>
         /// 调整 dpi
         /// </summary>
         public bool ChangeDpi { get; set; }

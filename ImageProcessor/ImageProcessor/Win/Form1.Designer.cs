@@ -31,9 +31,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tbximgpath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.tbxWidth = new System.Windows.Forms.TextBox();
-            this.tbxHeight = new System.Windows.Forms.TextBox();
             this.tbxYDpi = new System.Windows.Forms.TextBox();
             this.tbxXdpi = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -69,28 +67,12 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "宽度(px)：";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(458, 116);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 12);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "高度(px)：";
-            // 
             // tbxWidth
             // 
             this.tbxWidth.Location = new System.Drawing.Point(322, 112);
             this.tbxWidth.Name = "tbxWidth";
             this.tbxWidth.Size = new System.Drawing.Size(100, 21);
             this.tbxWidth.TabIndex = 4;
-            // 
-            // tbxHeight
-            // 
-            this.tbxHeight.Location = new System.Drawing.Point(533, 112);
-            this.tbxHeight.Name = "tbxHeight";
-            this.tbxHeight.Size = new System.Drawing.Size(100, 21);
-            this.tbxHeight.TabIndex = 5;
             // 
             // tbxYDpi
             // 
@@ -176,9 +158,7 @@
             this.Controls.Add(this.tbxXdpi);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.tbxHeight);
             this.Controls.Add(this.tbxWidth);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tbximgpath);
             this.Controls.Add(this.label1);
@@ -195,9 +175,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbximgpath;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tbxWidth;
-        private System.Windows.Forms.TextBox tbxHeight;
         private System.Windows.Forms.TextBox tbxYDpi;
         private System.Windows.Forms.TextBox tbxXdpi;
         private System.Windows.Forms.Label label4;

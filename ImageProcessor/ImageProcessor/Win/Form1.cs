@@ -111,7 +111,6 @@ namespace ImageProcessor
         private ImageParam PrepareData()
         {
             int.TryParse(this.tbxWidth.Text, out int width);
-            int.TryParse(this.tbxHeight.Text, out int height);
             int.TryParse(this.tbxXdpi.Text, out int xdpi);
             int.TryParse(this.tbxYDpi.Text, out int ydpi);
 
@@ -119,8 +118,7 @@ namespace ImageProcessor
             {
                 PicPath = this.tbximgpath.Text,
                 ChangeDimension = this.cbxChangeDimension.Checked,
-                Width = width,
-                Height = height,
+                Width = width, 
                 ChangeDpi = this.cbxChangeDpi.Checked,
                 Xdpi = xdpi,
                 Ydpi = ydpi
@@ -143,13 +141,7 @@ namespace ImageProcessor
                 {
                     MessageBox.Show($"图片宽度 {imageParam.Width} 不合法");
                     return false;
-                }
-
-                if (imageParam.Height < 0)
-                {
-                    MessageBox.Show($"图片高度 {imageParam.Height} 不合法");
-                    return false;
-                }
+                } 
             }
 
             if (imageParam.ChangeDpi)

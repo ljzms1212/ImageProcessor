@@ -36,24 +36,23 @@ namespace ImageProcessor.Core
 
             //转换 size
             int width = image.Width;
-            int height = image.Height;
+            int imageheight = image.Height;
             if (imageParam.ChangeDimension)
             {
-                width = imageParam.Width;
-                height = imageParam.Height;
+                width = imageParam.Width; 
             }
 
             // 获取图片比率 ,等比例压缩， width和height需要进行换算
             var aspectRatio = Convert.ToDouble(image.Width) / Convert.ToDouble(image.Height);
-            int tempHeight = Convert.ToInt32(width / aspectRatio);
-            if (tempHeight > height)
-            {
-                width = Convert.ToInt32(height * aspectRatio);
-            }
-            else
-            {
-                height = tempHeight;
-            }
+            int height = Convert.ToInt32(width / aspectRatio);
+            //if (tempHeight > height)
+            //{
+            //    width = Convert.ToInt32(height * aspectRatio);
+            //}
+            //else
+            //{
+            //    height = tempHeight;
+            //} 
 
             //根据指定大小创建Bitmap实例  
             Bitmap bt = new Bitmap(width, height);
@@ -61,7 +60,8 @@ namespace ImageProcessor.Core
             {
                 g.Clear(Color.White);
                 //设置画布的描绘质量  
-                Rectangle rect = new Rectangle((imageParam.Width - width) / 2, (imageParam.Height - height) / 2, width, height);
+                //Rectangle rect = new Rectangle((imageParam.Width - width) / 2, (height - imageheight) / 2, width, height);
+                Rectangle rect = new Rectangle(0, 0, width, height);
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.SmoothingMode = SmoothingMode.HighQuality;
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
